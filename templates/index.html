@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadRescue - Emergency Assistance Portal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    /* replace the starting styles under <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --primary-accent: #f97316;
+            /* Warning Orange */
+            --danger-accent: #ef4444;
+            /* Emergency Red */
+            --text-color: #f8fafc;
+            --success-color: #22c55e;
+            /* Active Green */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --neon-blue: #38bdf8;
+        }
+
+        html,
+        body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, var(--bg-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        /* Enforce center alignment inside app-container on mobile */
+        .app-container {
+            width: 90%;
+            max-width: 480px;
+            margin: 0 auto;
+            /* Keeps it strictly centered */
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* Enforce center alignment inside app-container on mobile */
+        .app-container {
+            width: 90%;
+            max-width: 480px;
+            margin: 0 auto;
+            /* Keeps it strictly centered */
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, var(--bg-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            overflow-x: hidden;
+        }
+
+        /* ==================== 1. START OVERLAY ==================== */
+        #start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #090d16;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+        }
+
+        .start-pulse-btn {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--danger-accent) 0%, #991b1b 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: white;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            animation: startPulse 1.8s infinite ease-in-out;
+        }
+
+        .start-text {
+            margin-top: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            text-align: center;
+            /* 👈 Isse "PORTAL" center mein locked rahega */
+            max-width: 280px;
+            /* 👈 Isse har mobile screen par clean alignment milegi */
+        }
+
+        @keyframes startPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            }
+
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 40px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        /* ==================== 2. ANIMATED INTRO (SPLASH SCREEN) ==================== */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f172a;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .splash-road {
+            position: relative;
+            width: 320px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            margin-top: 80px;
+        }
+
+        .splash-car {
+            position: absolute;
+            bottom: 4px;
+            left: -50px;
+            font-size: 2.5rem;
+            color: var(--primary-accent);
+            text-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+        }
+
+        .splash-trouble {
+            position: absolute;
+            top: -42px;
+            left: 135px;
+            font-size: 1.8rem;
+            color: var(--danger-accent);
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .smoke-container {
+            position: absolute;
+            bottom: 30px;
+            left: 170px;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .smoke-particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(148, 163, 184, 0.6);
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: smokeRise 1.5s infinite ease-out;
+            opacity: 0;
+        }
+
+        @keyframes smokeRise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-80px) translateX(25px) scale(3.5);
+                opacity: 0;
+                filter: blur(12px);
+            }
+        }
+
+        .splash-logo-reveal {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ffffff, var(--primary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: scale(0.6);
+            text-shadow: 0 0 35px rgba(249, 115, 22, 0.6);
+        }
+
+        .drive-animation {
+            animation: carDriveAndBreak 4s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .trouble-animation {
+            animation: popTrouble 4s forwards ease-out;
+        }
+
+        .logo-animation {
+            animation: logoZoomPop 4s forwards ease-out;
+        }
+
+        @keyframes carDriveAndBreak {
+            0% {
+                left: -50px;
+                transform: translateY(0);
+            }
+
+            35% {
+                left: 130px;
+                transform: translateY(0);
+            }
+
+            40% {
+                left: 130px;
+                transform: translateY(-8px) rotate(-6deg);
+            }
+
+            45% {
+                left: 130px;
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                left: 130px;
+                transform: translateY(-3px);
+            }
+
+            55% {
+                left: 130px;
+                transform: translateY(0);
+            }
+
+            60% {
+                left: 130px;
+                transform: translateY(-2px);
+            }
+
+            65% {
+                left: 130px;
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            75% {
+                opacity: 0;
+            }
+
+            100% {
+                left: 130px;
+                opacity: 0;
+            }
+        }
+
+        @keyframes popTrouble {
+
+            0%,
+            35% {
+                opacity: 0;
+                transform: scale(0) translateY(10px);
+            }
+
+            40% {
+                opacity: 1;
+                transform: scale(1.3) translateY(0);
+            }
+
+            45% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            65% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            75% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes logoZoomPop {
+
+            0%,
+            72% {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+
+            82% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+
+            90% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ==================== 3. PHYSICAL NIGHT-SOS OVERLAY ==================== */
+        #sos-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10001;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .sos-active-panel {
+            animation: flashSOS 0.8s infinite alternate;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sos-icon-big {
+            font-size: 6rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .sos-text-main {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            letter-spacing: 2px;
+        }
+
+        .sos-text-sub {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+            max-width: 80%;
+        }
+
+        .close-sos-btn {
+            position: absolute;
+            bottom: 50px;
+            background: white;
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .close-sos-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes flashSOS {
+            0% {
+                background-color: var(--danger-accent);
+            }
+
+            100% {
+                background-color: var(--primary-accent);
+            }
+        }
+
+        /* ==================== 4. MAIN APP CONTAINER ==================== */
+        .app-container {
+            width: 90%;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .app-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header Dashboard Layout */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-area-side {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary-accent);
+            text-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, var(--primary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* SOS Switcher Button */
+        .sos-toggle {
+            background: linear-gradient(135deg, var(--danger-accent), #991b1b);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            animation: pulseSOSButton 1.5s infinite alternate;
+        }
+
+        @keyframes pulseSOSButton {
+            0% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        /* Vehicle Tabs & Issues */
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vehicle-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .vehicle-tab {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-tab i {
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+            display: block;
+            color: #94a3b8;
+        }
+
+        .vehicle-tab span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+        .vehicle-tab.active {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+        }
+
+        .vehicle-tab.active i,
+        .vehicle-tab.active span {
+            color: var(--primary-accent);
+        }
+
+        .issue-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .issue-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--glass-border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .issue-card i {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            width: 18px;
+            text-align: center;
+        }
+
+        .issue-card span {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .issue-card.active {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+        }
+
+        /* ==================== FEATURE 2: VOICE DIAGNOSTIC BUTTON STYLES ==================== */
+        .voice-assist-btn {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .voice-assist-btn.listening {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger-accent);
+            color: var(--danger-accent);
+            animation: pulseMicrophone 1s infinite alternate;
+        }
+
+        @keyframes pulseMicrophone {
+            0% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        /* ==================== 5. ENGINE SOUND-MATCH BOARD ==================== */
+        #soundBoardPanel {
+            display: none;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 15px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .sound-board-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .sound-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: white;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .sound-btn i {
+            font-size: 1rem;
+            color: var(--neon-blue);
+        }
+
+        .sound-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--neon-blue);
+        }
+
+        .sound-btn.playing {
+            background: var(--neon-blue);
+            border-color: white;
+            color: black;
+        }
+
+        .sound-btn.playing i {
+            color: black;
+        }
+
+        /* ==================== 6. FAIR PRICE ESTIMATOR ==================== */
+        .price-estimator-card {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 14px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .price-range {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--success-color);
+            letter-spacing: 0.5px;
+        }
+
+        /* Big Rescue Button */
+        .rescue-btn {
+            background: linear-gradient(135deg, var(--danger-accent) 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .rescue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5);
+        }
+
+        /* ==================== 7. RADAR SCREEN / LIVE GRID MAP ==================== */
+        .radar-screen {
+            display: none;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: #020617;
+            border: 3px solid #1e293b;
+            margin: 15px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(249, 115, 22, 0.2), 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .radar-sweep {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background: linear-gradient(45deg, rgba(249, 115, 22, 0.3) 0%, transparent 80%);
+            transform-origin: bottom right;
+            top: 0;
+            left: 0;
+            border-right: 1.5px solid var(--primary-accent);
+            animation: sweep 2.5s infinite linear;
+        }
+
+        .radar-center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: var(--primary-accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary-accent);
+        }
+
+        /* Dynamic GPS Radar target blips */
+        .target-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--success-color);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success-color);
+            opacity: 0;
+            animation: blinkTarget 1.5s infinite ease-in-out;
+        }
+
+        /* INTERACTIVE 2D GRID MAP (Replaces Radar after GPS Scan) */
+        .live-grid-map {
+            display: none;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #091220 30%, #030712 100%);
+            border: 3px solid var(--success-color);
+            margin: 15px auto;
+            position: relative;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
+            animation: slideUp 0.4s ease;
+        }
+
+        /* Stylized Radar grid rings */
+        .map-ring-1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%;
+            height: 75%;
+            border: 1px dashed rgba(34, 197, 94, 0.15);
+            border-radius: 50%;
+        }
+
+        .map-ring-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%;
+            height: 40%;
+            border: 1px dashed rgba(34, 197, 94, 0.15);
+            border-radius: 50%;
+        }
+
+        /* Map Pin Nodes */
+        .user-gps-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+            animation: pulseUserPin 1.5s infinite;
+        }
+
+        @keyframes pulseUserPin {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.25);
+                filter: drop-shadow(0 0 15px var(--neon-blue));
+            }
+        }
+
+        /* Interactive Mechanic pins */
+        .mech-gps-pin {
+            position: absolute;
+            color: var(--success-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            filter: drop-shadow(0 0 6px var(--success-color));
+            transition: all 0.3s;
+        }
+
+        .mech-gps-pin:hover {
+            transform: scale(1.3) translateY(-3px);
+            color: white;
+            filter: drop-shadow(0 0 12px white);
+        }
+
+        /* ==================== 8. STATUS CONTROL SATELLITE PANEL ==================== */
+        .status-container {
+            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid var(--glass-border);
+            margin-top: 15px;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .satellite-connection-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px dashed rgba(249, 115, 22, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .sat-icon {
+            font-size: 2rem;
+            color: var(--neon-blue);
+            animation: floatSatellite 4s infinite ease-in-out;
+        }
+
+        .dish-icon {
+            font-size: 1.8rem;
+            color: var(--primary-accent);
+            animation: tiltDish 3s infinite ease-in-out;
+        }
+
+        .sat-beams {
+            position: relative;
+            width: 100px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sat-beam-wave {
+            position: absolute;
+            border-right: 3px solid rgba(249, 115, 22, 0.75);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            transform: rotate(-45deg);
+            opacity: 0;
+            animation: sendSignal 2s infinite linear;
+        }
+
+        .sat-beam-wave:nth-child(2) {
+            animation-delay: 0.6s;
+            width: 45px;
+            height: 45px;
+        }
+
+        .sat-beam-wave:nth-child(3) {
+            animation-delay: 1.2s;
+            width: 60px;
+            height: 60px;
+        }
+
+        .coordinate-info {
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        /* ==================== FEATURE 1: OFFLINE SMS FALLBACK STYLES ==================== */
+        .sms-fallback-container {
+            display: none;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 18px;
+            padding: 15px;
+            margin-top: 15px;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .sms-send-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .sms-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+
+        /* ==================== 9. "MECHANIC EN ROUTE" TRACKER ==================== */
+        #enRoutePanel {
+            display: none;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--success-color);
+            border-radius: 20px;
+            padding: 18px;
+            margin-top: 15px;
+            animation: slideUp 0.5s ease;
+        }
+
+        .route-track-line {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin: 25px 10px;
+            position: relative;
+        }
+
+        .route-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-accent), var(--success-color));
+            width: 0%;
+            border-radius: 3px;
+            transition: width 1s linear;
+        }
+
+        .moving-tow-truck {
+            position: absolute;
+            top: -15px;
+            left: 0%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+            text-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+            transition: left 1s linear;
+        }
+
+        .user-home-pin {
+            position: absolute;
+            top: -12px;
+            right: 0;
+            font-size: 1.3rem;
+            color: var(--neon-blue);
+        }
+
+        .tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .countdown-timer {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            font-family: monospace;
+        }
+
+        /* ==================== 10. NEIGHBORHOOD MECHANICS CARD LIST & FILTERING ==================== */
+        .mechanic-list {
+            display: none;
+            margin-top: 15px;
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        /* FEATURE 4: FILTER CHIPS BAR */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-chip {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-chip:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            color: var(--neon-blue);
+        }
+
+        .filter-chip.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
+        }
+
+        .mechanic-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(34, 197, 94, 0.15);
+            border-left: 4px solid var(--success-color);
+            border-radius: 14px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .mechanic-card:hover {
+            transform: translateX(5px);
+            background: rgba(30, 41, 59, 1);
+        }
+
+        .mechanic-card.selected-mech {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+        }
+
+        .mech-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mech-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .call-mech-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .call-mech-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Animations Keyframes */
+        @keyframes sweep {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes blinkTarget {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0.6);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes floatSatellite {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-15deg);
+            }
+
+            50% {
+                transform: translateY(-5px) rotate(-5deg);
+            }
+        }
+
+        @keyframes tiltDish {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+        }
+
+        @keyframes sendSignal {
+            0% {
+                transform: translate(-25px, -3px) rotate(-45deg) scale(0.4);
+                opacity: 0;
+            }
+
+            30% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translate(25px, 3px) rotate(-45deg) scale(1.1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ==================== 1. START OVERLAY ==================== -->
+    <div id="start-overlay" onclick="launchApp()">
+        <div class="start-pulse-btn">
+            <i class="fa-solid fa-power-off"></i>
+        </div>
+        <div class="start-text">Tap to Launch Emergency Portal</div>
+    </div>
+
+    <!-- ==================== 2. SPLASH SCREEN INTRO ==================== -->
+    <div id="splash-screen">
+        <h1 class="splash-logo-reveal" id="splashLogo">RoadRescue</h1>
+
+        <div class="splash-road" id="splashRoad">
+            <div class="splash-trouble" id="splashTrouble">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="splash-car" id="splashCar">
+                <i class="fa-solid fa-car-side"></i>
+            </div>
+
+            <!-- Grey Smoke Clouds -->
+            <div class="smoke-container" id="smokeBox">
+                <div class="smoke-particle" style="animation-delay: 0s;"></div>
+                <div class="smoke-particle" style="animation-delay: 0.2s; left: 8px;"></div>
+                <div class="smoke-particle" style="animation-delay: 0.4s; left: -8px;"></div>
+                <div class="smoke-particle" style="animation-delay: 0.6s;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 3. PHYSICAL NIGHT-SOS REFLECTOR BEACON ==================== -->
+    <div id="sos-overlay">
+        <div class="sos-active-panel">
+            <i class="fa-solid fa-triangle-exclamation sos-icon-big"></i>
+            <h2 class="sos-text-main">EMERGENCY SOS ACTIVE</h2>
+            <p class="sos-text-sub">Keep this screen facing the road to warn oncoming vehicles. 🚨</p>
+            <button class="close-sos-btn" onclick="toggleSOS(false)">
+                <i class="fa-solid fa-xmark"></i> Exit SOS Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 4. MAIN APP DASHBOARD ==================== -->
+    <div class="app-container" id="mainDashboard">
+
+        <!-- Header area with SOS Switch -->
+        <div class="dashboard-header">
+            <div class="logo-area-side">
+                <i class="fa-solid fa-truck-pickup logo-icon"></i>
+                <h1 class="app-title">RoadRescue</h1>
+            </div>
+            <button class="sos-toggle" onclick="toggleSOS(true)">
+                <i class="fa-solid fa-circle-exclamation"></i> SOS Beacon
+            </button>
+        </div>
+
+        <!-- Section 1: Vehicle Selector -->
+        <div class="section-label">1. Select Your Vehicle</div>
+        <div class="vehicle-selector">
+            <div class="vehicle-tab active" onclick="selectVehicle(this, 'Bike')">
+                <i class="fa-solid fa-motorcycle"></i>
+                <span>Two-Wheeler</span>
+            </div>
+            <div class="vehicle-tab" onclick="selectVehicle(this, 'Car')">
+                <i class="fa-solid fa-car"></i>
+                <span>Four-Wheeler</span>
+            </div>
+            <div class="vehicle-tab" onclick="selectVehicle(this, 'Truck')">
+                <i class="fa-solid fa-truck"></i>
+                <span>Heavy</span>
+            </div>
+        </div>
+
+        <!-- Section 2: Issues Grid -->
+        <div class="section-label">
+            <span>2. Select Your Issue</span>
+            <!-- FEATURE 2: VOICE DIAGNOSTIC BUTTON -->
+            <button id="voiceBtn" class="voice-assist-btn" onclick="startVoiceRecognition(event)">
+                <i class="fa-solid fa-microphone"></i> Talk Diagnostic
+            </button>
+        </div>
+        <div class="issue-grid">
+            <div class="issue-card active" onclick="selectIssue(this, 'Flat Tyre')">
+                <i class="fa-solid fa-circle-dot"></i>
+                <span>Flat Tyre</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Dead Battery')">
+                <i class="fa-solid fa-car-battery"></i>
+                <span>Battery Dead</span>
+            </div>
+            <div class="issue-card" id="engineIssueCard" onclick="selectIssue(this, 'Engine Smoke')">
+                <i class="fa-solid fa-wrench"></i>
+                <span>Engine Issue</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Towing Needed')">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+                <span>Towing</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Out of Fuel')">
+                <i class="fa-solid fa-gas-pump"></i>
+                <span>Fuel Delivery</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Key Lockout')">
+                <i class="fa-solid fa-key"></i>
+                <span>Lockout</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Brake Failure')">
+                <i class="fa-solid fa-circle-stop"></i>
+                <span>Brake Issue</span>
+            </div>
+            <div class="issue-card" onclick="selectIssue(this, 'Engine Overheat')">
+                <i class="fa-solid fa-temperature-high"></i>
+                <span>Overheating</span>
+            </div>
+        </div>
+
+        <!-- sound Matcher assistant box (only visible when engine issue is selected) -->
+        <div id="soundBoardPanel">
+            <div class="section-label" style="color: var(--neon-blue); font-size: 0.7rem;">
+                <i class="fa-solid fa-headphones"></i> Sound-Match Diagnostic Assistant
+            </div>
+            <p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px;">Click sounds below to match with your
+                engine sound:</p>
+            <div class="sound-board-grid">
+                <button class="sound-btn" onclick="playDiagnosticSound('ticking', this)">
+                    <i class="fa-solid fa-clock"></i>Ticking/Clicking
+                </button>
+                <button class="sound-btn" onclick="playDiagnosticSound('screeching', this)">
+                    <i class="fa-solid fa-wave-square"></i>Screech Belt
+                </button>
+                <button class="sound-btn" onclick="playDiagnosticSound('grinding', this)">
+                    <i class="fa-solid fa-industry"></i>Grinding Metal
+                </button>
+            </div>
+        </div>
+
+        <!-- Section 3: Fair Price Estimator Card -->
+        <div class="price-estimator-card">
+            <div>
+                <div class="price-label">Fair-Price Estimate</div>
+                <div style="font-size: 0.7rem; color: #94a3b8;">Avg Local rate bracket</div>
+            </div>
+            <div class="price-range" id="priceGauge">₹150 - ₹250</div>
+        </div>
+
+        <!-- Action Rescue Trigger Button -->
+        <button class="rescue-btn" id="findBtn">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            Find Mechanic Near Me
+        </button>
+
+        <!-- Sweeping Submarine Radar Screen -->
+        <div class="radar-screen" id="radar">
+            <div class="radar-sweep"></div>
+            <div class="radar-center-dot"></div>
+            <!-- blips -->
+            <div class="target-dot" style="top: 30%; left: 45%; animation-delay: 0.3s;"></div>
+            <div class="target-dot" style="top: 72%; left: 70%; animation-delay: 0.8s;"></div>
+            <div class="target-dot" style="top: 55%; left: 25%; animation-delay: 1.2s;"></div>
+        </div>
+
+        <!-- ACTIVE 2D GRID MAP (Revealed after coordinates verified) -->
+        <div class="live-grid-map" id="liveMap">
+            <div class="map-ring-1"></div>
+            <div class="map-ring-2"></div>
+
+            <!-- Pulse User Blue Pin -->
+            <div class="user-gps-pin">
+                <i class="fa-solid fa-circle-user"></i>
+            </div>
+
+            <!-- Blinking Green Mechanic Pin Droppings -->
+            <div class="mech-gps-pin" id="pin-1" style="top: 25%; left: 35%;" onclick="focusOnMechanic(1)">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="mech-gps-pin" id="pin-2" style="top: 65%; left: 70%;" onclick="focusOnMechanic(2)">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="mech-gps-pin" id="pin-3" style="top: 50%; left: 18%;" onclick="focusOnMechanic(3)">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+        </div>
+
+        <!-- Satellite Connection status telemetry -->
+        <div class="status-container" id="statusBox">
+            <div class="satellite-connection-panel">
+                <div class="sat-node">
+                    <i class="fa-solid fa-satellite sat-icon"></i>
+                </div>
+                <div class="sat-beams">
+                    <div class="sat-beam-wave"></div>
+                    <div class="sat-beam-wave"></div>
+                    <div class="sat-beam-wave"></div>
+                </div>
+                <div class="sat-node">
+                    <i class="fa-solid fa-satellite-dish dish-icon"></i>
+                </div>
+            </div>
+
+            <div class="coordinate-info">
+                <span id="latText">Lat: --</span>
+                <span id="longText">Long: --</span>
+            </div>
+            <div class="status-header">
+                <span style="color: #94a3b8;"><i class="fa-solid fa-network-wired"></i> Connection:</span>
+                <span id="statusIndicator" style="color: var(--primary-accent);">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Initializing...
+                </span>
+            </div>
+        </div>
+
+        <!-- FEATURE 1: OFFLINE SMS FALLBACK CONTAINER -->
+        <div class="sms-fallback-container" id="smsBox">
+            <div
+                style="font-size: 0.85rem; color: var(--danger-accent); font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom: 8px;">
+                <i class="fa-solid fa-circle-exclamation"></i> Offline Fallback System Activated
+            </div>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 12px;">
+                Network is weak or server is offline. Send direct GPS coordinates via SMS to local emergency helpdesk.
+            </p>
+            <button class="sms-send-btn" onclick="sendOfflineSMS()">
+                <i class="fa-solid fa-message-sms"></i> Send Offline GPS SMS
+            </button>
+        </div>
+
+        <!-- "MECHANIC EN ROUTE" LIVE TRACKER AND GAME COUNTDOWN -->
+        <div id="enRoutePanel">
+            <div class="tracker-header">
+                <div>
+                    <h3 style="font-size: 0.95rem; color: var(--success-color);"><i
+                            class="fa-solid fa-truck-ramp-box"></i> Mechanic En-Route</h3>
+                    <p style="font-size: 0.7rem; color: #94a3b8;" id="activeRescuer">Speedy Motors is coming</p>
+                </div>
+                <div class="countdown-timer" id="countdown">12:00</div>
+            </div>
+
+            <!-- Animated progress timeline tracking -->
+            <div class="route-track-line">
+                <div class="route-fill" id="trackProgress"></div>
+                <div class="moving-tow-truck" id="trackerTruck">
+                    <i class="fa-solid fa-truck-pickup"></i>
+                </div>
+                <div class="user-home-pin">
+                    <i class="fa-solid fa-house-chimney-crack"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Neighborhood mechanics results lists -->
+        <div class="mechanic-list" id="mechanicList">
+            <div class="section-label" style="color: var(--success-color);">
+                <i class="fa-solid fa-circle-check"></i> 3 Mechanics Plotted on Map
+            </div>
+
+            <!-- FEATURE 4: FILTER CHIPS BAR -->
+            <div class="filter-bar">
+                <span class="filter-chip active" id="filter-fastest" onclick="applyMechanicFilter('fastest')">
+                    <i class="fa-solid fa-bolt"></i> Fastest
+                </span>
+                <span class="filter-chip" id="filter-cheapest" onclick="applyMechanicFilter('cheapest')">
+                    <i class="fa-solid fa-wallet"></i> Cheapest
+                </span>
+                <span class="filter-chip" id="filter-toprated" onclick="applyMechanicFilter('toprated')">
+                    <i class="fa-solid fa-star"></i> Top Rated
+                </span>
+            </div>
+
+            <!-- DYNAMIC RECIPIENT CONTAINER FOR SORTING -->
+            <div id="mechanicsContainer">
+                <!-- Sorted cards injected here -->
+            </div>
+        </div>
+
+    </div>
+    // Register PWA Service Worker
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+    .then(reg => console.log('Service Worker Registered!'))
+    .catch(err => console.log('Service Worker Registration Failed:', err));
+    });
+    }
+
+    <!-- JavaScript logic and Audio synthesizer code -->
+    <script>
+        let selectedVehicleType = "Bike";
+        let selectedIssueType = "Flat Tyre";
+        let audioCtx = null;
+        let diagnosticSynth = null;
+        let currentLat = null;
+        let currentLong = null;
+
+        // Pricing Matrix For dynamic cost estimator
+        const priceMatrix = {
+            "Bike": { "Flat Tyre": "₹150 - ₹250", "Dead Battery": "₹200 - ₹350", "Engine Smoke": "₹500 - ₹1200", "Towing Needed": "₹400 - ₹800", "Out of Fuel": "₹100 - ₹200", "Key Lockout": "₹150 - ₹300", "Brake Failure": "₹250 - ₹500", "Engine Overheat": "₹300 - ₹600" },
+            "Car": { "Flat Tyre": "₹250 - ₹450", "Dead Battery": "₹300 - ₹600", "Engine Smoke": "₹1200 - ₹4500", "Towing Needed": "₹1200 - ₹2500", "Out of Fuel": "₹200 - ₹400", "Key Lockout": "₹350 - ₹800", "Brake Failure": "₹600 - ₹1500", "Engine Overheat": "₹800 - ₹2000" },
+            "Truck": { "Flat Tyre": "₹800 - ₹1500", "Dead Battery": "₹1000 - ₹2500", "Engine Smoke": "₹3500 - ₹12000", "Towing Needed": "₹3000 - ₹8000", "Out of Fuel": "₹500 - ₹1500", "Key Lockout": "₹800 - ₹2000", "Brake Failure": "₹1500 - ₹4500", "Engine Overheat": "₹2000 - ₹6000" }
+        };
+
+        // FEATURE 4: STATIC DATASET TO FILTER ON CLIENT SIDE
+        let mechanicsData = [
+            { id: 1, name: "Speedy Motors", rating: 4.8, distance: 1.2, cost: 250 },
+            { id: 2, name: "Roadside Care Center", rating: 4.5, distance: 2.4, cost: 180 },
+            { id: 3, name: "Standard Garage", rating: 4.2, distance: 3.1, cost: 120 }
+        ];
+
+        // Update Fair Price Indicator
+        function updateFairPrice() {
+            const range = priceMatrix[selectedVehicleType][selectedIssueType];
+            document.getElementById('priceGauge').textContent = range;
+        }
+
+        // --- ENHANCED DYNAMIC INTRO AUDIO SYNTHESIS ENGINE ---
+        function playEngineSound() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                const masterGain = audioCtx.createGain();
+                masterGain.gain.setValueAtTime(0.65, audioCtx.currentTime);
+                masterGain.connect(audioCtx.destination);
+
+                const osc = audioCtx.createOscillator();
+                const engineGain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(45, audioCtx.currentTime);
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(140, audioCtx.currentTime);
+
+                osc.connect(filter);
+                filter.connect(engineGain);
+                engineGain.connect(masterGain);
+
+                engineGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                engineGain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + 0.4);
+                osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 1.2);
+
+                // --- Tire Brake Screech (Exactly at 1.4s) ---
+                setTimeout(() => {
+                    const screechOsc = audioCtx.createOscillator();
+                    const screechGain = audioCtx.createGain();
+
+                    screechOsc.type = 'triangle';
+                    screechOsc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    screechOsc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.35);
+
+                    screechGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    screechGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+                    screechOsc.connect(screechGain);
+                    screechGain.connect(masterGain);
+                    screechOsc.start();
+                    screechOsc.stop(audioCtx.currentTime + 0.4);
+                }, 1400);
+
+                // --- Coughing Engine Sputters (At 1.4s) ---
+                setTimeout(() => {
+                    osc.frequency.setValueAtTime(32, audioCtx.currentTime);
+                    filter.frequency.setValueAtTime(100, audioCtx.currentTime);
+
+                    let sputterTime = audioCtx.currentTime;
+                    for (let i = 0; i < 16; i++) {
+                        sputterTime += 0.1;
+                        engineGain.gain.setValueAtTime(i % 2 === 0 ? 0.08 : 0.85, sputterTime);
+                    }
+                }, 1400);
+
+                // --- Engine Dies (At 3.0s) ---
+                setTimeout(() => {
+                    osc.frequency.exponentialRampToValueAtTime(6, audioCtx.currentTime + 0.8);
+                    engineGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                }, 3000);
+
+                osc.start();
+
+                setTimeout(() => {
+                    osc.stop();
+                    audioCtx.close();
+                }, 4000);
+
+            } catch (e) {
+                console.error("Audio Synthesis Failed:", e);
+            }
+        }
+
+        // --- WEB AUDIO DIAGNOSTIC ENGINE FAILURE SYNTHESIS ---
+        function playDiagnosticSound(type, btnElement) {
+            if (diagnosticSynth) {
+                try { diagnosticSynth.stop(); } catch (e) { }
+                diagnosticSynth = null;
+                document.querySelectorAll('.sound-btn').forEach(btn => btn.classList.remove('playing'));
+                return;
+            }
+
+            btnElement.classList.add('playing');
+            const synthCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = synthCtx.createOscillator();
+            const gainNode = synthCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(synthCtx.destination);
+            diagnosticSynth = osc;
+
+            if (type === 'ticking') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(450, synthCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.001, synthCtx.currentTime);
+
+                let playTime = synthCtx.currentTime;
+                for (let i = 0; i < 20; i++) {
+                    playTime += 0.15;
+                    gainNode.gain.setValueAtTime(0.3, playTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, playTime + 0.04);
+                }
+                osc.start();
+                osc.stop(playTime + 0.1);
+            }
+            else if (type === 'screeching') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, synthCtx.currentTime);
+                const lfo = synthCtx.createOscillator();
+                const lfoGain = synthCtx.createGain();
+                lfo.frequency.setValueAtTime(8, synthCtx.currentTime);
+                lfoGain.gain.setValueAtTime(100, synthCtx.currentTime);
+                lfo.connect(lfoGain);
+                lfoGain.connect(osc.frequency);
+
+                gainNode.gain.setValueAtTime(0.001, synthCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.12, synthCtx.currentTime + 0.3);
+
+                lfo.start();
+                osc.start();
+
+                gainNode.gain.setValueAtTime(0.12, synthCtx.currentTime + 2.5);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, synthCtx.currentTime + 3);
+                osc.stop(synthCtx.currentTime + 3);
+                lfo.stop(synthCtx.currentTime + 3);
+            }
+            else if (type === 'grinding') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(90, synthCtx.currentTime);
+
+                const filter = synthCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(400, synthCtx.currentTime);
+                filter.Q.setValueAtTime(3, synthCtx.currentTime);
+
+                osc.disconnect(gainNode);
+                osc.connect(filter);
+                filter.connect(gainNode);
+
+                gainNode.gain.setValueAtTime(0.001, synthCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.4, synthCtx.currentTime + 0.2);
+
+                let grindTime = synthCtx.currentTime;
+                for (let i = 0; i < 30; i++) {
+                    grindTime += 0.1;
+                    gainNode.gain.setValueAtTime(Math.random() * 0.2 + 0.15, grindTime);
+                }
+
+                osc.start();
+                gainNode.gain.setValueAtTime(0.3, grindTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, grindTime + 0.5);
+                osc.stop(grindTime + 0.5);
+            }
+
+            osc.onended = () => {
+                btnElement.classList.remove('playing');
+                diagnosticSynth = null;
+                synthCtx.close();
+            };
+        }
+
+        // FEATURE 2: VOICE DIAGNOSTIC SPEECH-TO-TEXT ASSISTANT
+        function startVoiceRecognition(event) {
+            event.stopPropagation();
+            const voiceBtn = document.getElementById('voiceBtn');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert("Voice assistance is not supported in this browser. Please use Google Chrome.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                voiceBtn.classList.add('listening');
+                voiceBtn.innerHTML = `<i class="fa-solid fa-microphone-lines fa-beat"></i> Listening...`;
+            };
+
+            recognition.onresult = (e) => {
+                const speechToText = e.results[0][0].transcript.toLowerCase();
+                console.log("Speech captured:", speechToText);
+                voiceBtn.innerHTML = `<i class="fa-solid fa-check"></i> Found!`;
+
+                let matchedIssue = null;
+                if (speechToText.includes("puncture") || speechToText.includes("tyre") || speechToText.includes("tire") || speechToText.includes("flat")) {
+                    matchedIssue = "Flat Tyre";
+                } else if (speechToText.includes("battery") || speechToText.includes("dead") || speechToText.includes("start")) {
+                    matchedIssue = "Dead Battery";
+                } else if (speechToText.includes("engine") || speechToText.includes("smoke") || speechToText.includes("fire") || speechToText.includes("issue")) {
+                    matchedIssue = "Engine Smoke";
+                } else if (speechToText.includes("tow") || speechToText.includes("pull") || speechToText.includes("towing")) {
+                    matchedIssue = "Towing Needed";
+                } else if (speechToText.includes("fuel") || speechToText.includes("gas") || speechToText.includes("petrol") || speechToText.includes("diesel")) {
+                    matchedIssue = "Out of Fuel";
+                } else if (speechToText.includes("key") || speechToText.includes("lock") || speechToText.includes("lockout")) {
+                    matchedIssue = "Key Lockout";
+                } else if (speechToText.includes("brake") || speechToText.includes("stop") || speechToText.includes("brakes")) {
+                    matchedIssue = "Brake Failure";
+                } else if (speechToText.includes("heat") || speechToText.includes("hot") || speechToText.includes("overheat") || speechToText.includes("temperature")) {
+                    matchedIssue = "Engine Overheat";
+                }
+
+                if (matchedIssue) {
+                    const cards = document.querySelectorAll('.issue-card');
+                    cards.forEach(card => {
+                        let checkText = card.textContent.trim().toLowerCase();
+                        let targetText = matchedIssue.toLowerCase();
+                        if (targetText === "engine smoke" && checkText.includes("engine")) {
+                            selectIssue(card, "Engine Smoke");
+                        } else if (targetText === "dead battery" && checkText.includes("battery")) {
+                            selectIssue(card, "Dead Battery");
+                        } else if (targetText === "towing needed" && checkText.includes("towing")) {
+                            selectIssue(card, "Towing Needed");
+                        } else if (targetText === "out of fuel" && checkText.includes("fuel")) {
+                            selectIssue(card, "Out of Fuel");
+                        } else if (targetText === "brake failure" && checkText.includes("brake")) {
+                            selectIssue(card, "Brake Failure");
+                        } else if (targetText === "engine overheat" && checkText.includes("overheating")) {
+                            selectIssue(card, "Engine Overheat");
+                        } else if (checkText.includes(targetText)) {
+                            selectIssue(card, matchedIssue);
+                        }
+                    });
+                    alert(`Voice Command Matched: "${matchedIssue}"! Highlighted on dashboard.`);
+                } else {
+                    alert(`Could not diagnose: "${speechToText}". Say keywords like: 'flat tyre', 'battery dead', 'engine issue', 'towing' or 'out of fuel'.`);
+                }
+            };
+
+            recognition.onerror = () => {
+                voiceBtn.classList.remove('listening');
+                voiceBtn.innerHTML = `<i class="fa-solid fa-microphone"></i> Talk Diagnostic`;
+            };
+
+            recognition.onend = () => {
+                voiceBtn.classList.remove('listening');
+                setTimeout(() => {
+                    voiceBtn.innerHTML = `<i class="fa-solid fa-microphone"></i> Talk Diagnostic`;
+                }, 2000);
+            };
+
+            recognition.start();
+        }
+
+        // FEATURE 1: OFFLINE SMS FALLBACK EXECUTION
+        function sendOfflineSMS() {
+            if (!currentLat || !currentLong) {
+                alert("GPS Location is not fetched yet. Click 'Find Mechanic Near Me' to scan first.");
+                return;
+            }
+            const phoneNumber = "+919876543210";
+            const smsBody = `EMERGENCY ROADRESCUE SOS! I am stuck with a ${selectedIssueType} on my ${selectedVehicleType}. Exact Coordinates: Lat: ${currentLat}, Long: ${currentLong}. Help needed immediately!`;
+            const smsUri = `sms:${phoneNumber}?body=${encodeURIComponent(smsBody)}`;
+            window.open(smsUri, '_blank');
+        }
+
+        // FEATURE 4: RENDER MECHANIC LIST WITH DYNAMIC SHUFFLING
+        function renderMechanicList(dataList) {
+            const container = document.getElementById('mechanicsContainer');
+            container.innerHTML = '';
+
+            dataList.forEach(mech => {
+                const card = document.createElement('div');
+                card.className = 'mechanic-card';
+                card.id = `card-mech-${mech.id}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="mech-name">${mech.name}</div>
+                        <div class="mech-sub">
+                            <i class="fa-solid fa-star" style="color: #fbbf24;"></i> ${mech.rating} 
+                            (${mech.distance} km away) • Cost Bracket: ₹${mech.cost}
+                        </div>
+                    </div>
+                    <button class="call-mech-btn" onclick="rescueStart('${mech.name}')">Call Now</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function applyMechanicFilter(filterType) {
+            document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+            document.getElementById(`filter-${filterType}`).classList.add('active');
+
+            let sortedData = [...mechanicsData];
+
+            if (filterType === 'fastest') {
+                sortedData.sort((a, b) => a.distance - b.distance);
+            } else if (filterType === 'cheapest') {
+                sortedData.sort((a, b) => a.cost - b.cost);
+            } else if (filterType === 'toprated') {
+                sortedData.sort((a, b) => b.rating - a.rating);
+            }
+
+            renderMechanicList(sortedData);
+        }
+
+        // --- PHYSICAL NIGHT-SOS MODE ---
+        function toggleSOS(state) {
+            const overlay = document.getElementById('sos-overlay');
+            if (state) {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // --- HANDLE LAUNCH TIMELINE ---
+        function launchApp() {
+            const overlay = document.getElementById('start-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+
+            const splash = document.getElementById('splash-screen');
+            splash.style.display = 'flex';
+
+            playEngineSound();
+
+            const car = document.getElementById('splashCar');
+            const trouble = document.getElementById('splashTrouble');
+            const smoke = document.getElementById('smokeBox');
+            const logo = document.getElementById('splashLogo');
+            const mainDash = document.getElementById('mainDashboard');
+
+            car.classList.add('drive-animation');
+            trouble.classList.add('trouble-animation');
+            logo.classList.add('logo-animation');
+
+            setTimeout(() => { smoke.style.display = 'block'; }, 1400);
+
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+                mainDash.classList.add('visible');
+                renderMechanicList(mechanicsData);
+            }, 4300);
+        }
+
+        // Tab Selection Handlers
+        function selectVehicle(element, type) {
+            document.querySelectorAll('.vehicle-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            selectedVehicleType = type;
+            updateFairPrice();
+        }
+
+        function selectIssue(element, issue) {
+            document.querySelectorAll('.issue-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            selectedIssueType = issue;
+
+            const soundPanel = document.getElementById('soundBoardPanel');
+            if (issue === 'Engine Smoke') {
+                soundPanel.style.display = 'block';
+            } else {
+                soundPanel.style.display = 'none';
+                if (diagnosticSynth) {
+                    try { diagnosticSynth.stop(); } catch (e) { }
+                    diagnosticSynth = null;
+                    document.querySelectorAll('.sound-btn').forEach(btn => btn.classList.remove('playing'));
+                }
+            }
+            updateFairPrice();
+        }
+
+        // --- ACTIVE MAP PIN FOCUSING INTERACTION ---
+        function focusOnMechanic(id) {
+            document.querySelectorAll('.mechanic-card').forEach(card => card.classList.remove('selected-mech'));
+            document.querySelectorAll('.mech-gps-pin').forEach(pin => pin.style.color = 'var(--success-color)');
+
+            const focusedCard = document.getElementById(`card-mech-${id}`);
+            const focusedPin = document.getElementById(`pin-${id}`);
+
+            if (focusedCard) focusedCard.classList.add('selected-mech');
+            if (focusedPin) focusedPin.style.color = 'white';
+
+            if (focusedCard) focusedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // --- "MECHANIC EN ROUTE" LIVE SIMULATION ---
+        function rescueStart(name) {
+            const tracker = document.getElementById('enRoutePanel');
+            const activeRescuer = document.getElementById('activeRescuer');
+            const fill = document.getElementById('trackProgress');
+            const truck = document.getElementById('trackerTruck');
+            const clock = document.getElementById('countdown');
+
+            tracker.style.display = 'block';
+            activeRescuer.textContent = `${name} has departed and is en route!`;
+            tracker.scrollIntoView({ behavior: 'smooth' });
+
+            // Reset animation
+            fill.style.width = '0%';
+            truck.style.left = '0%';
+
+            let duration = 120;
+            let progress = 0;
+
+            const simInterval = setInterval(() => {
+                progress += (100 / duration);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(simInterval);
+                    activeRescuer.innerHTML = `<span style="color:var(--success-color); font-weight:700;"><i class="fa-solid fa-bell"></i> Rescue Truck Arrived!</span>`;
+                }
+                fill.style.width = `${progress}%`;
+                truck.style.left = `${progress}%`;
+
+                let secondsRemaining = Math.max(0, Math.floor((100 - progress) * 0.12 * 60));
+                let mins = Math.floor(secondsRemaining / 60);
+                let secs = secondsRemaining % 60;
+                clock.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Geolocation interface logic
+        const findBtn = document.getElementById('findBtn');
+        const radar = document.getElementById('radar');
+        const liveMap = document.getElementById('liveMap');
+        const statusBox = document.getElementById('statusBox');
+        const smsBox = document.getElementById('smsBox');
+        const mechanicList = document.getElementById('mechanicList');
+
+        const latText = document.getElementById('latText');
+        const longText = document.getElementById('longText');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        findBtn.addEventListener('click', () => {
+            radar.style.display = 'block';
+            liveMap.style.display = 'none';
+            statusBox.style.display = 'block';
+            smsBox.style.display = 'none';
+            mechanicList.style.display = 'none';
+            document.getElementById('enRoutePanel').style.display = 'none';
+
+            statusIndicator.style.color = 'var(--primary-accent)';
+            statusIndicator.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Getting GPS...`;
+            latText.textContent = "Lat: Fetching...";
+            longText.textContent = "Long: Fetching...";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentLat = position.coords.latitude.toFixed(6);
+                        currentLong = position.coords.longitude.toFixed(6);
+
+                        latText.textContent = `Lat: ${currentLat}`;
+                        longText.textContent = `Long: ${currentLong}`;
+                        statusIndicator.innerHTML = `<i class="fa-solid fa-compass"></i> Location Verified`;
+
+                        sendToBackend(currentLat, currentLong);
+                    },
+                    (error) => {
+                        radar.style.display = 'none';
+                        statusIndicator.style.color = 'var(--danger-accent)';
+                        statusIndicator.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> GPS Access Denied`;
+                        alert("Bhai, GPS Location access denied! SMS Fallback system activated.");
+
+                        currentLat = "21.1942";
+                        currentLong = "81.2541";
+                        smsBox.style.display = 'block';
+                    }
+                );
+            } else {
+                alert("Your browser does not support location services.");
+                radar.style.display = 'none';
+            }
+        });
+
+        function sendToBackend(lat, long) {
+            statusIndicator.style.color = 'var(--primary-accent)';
+            statusIndicator.innerHTML = `<i class="fa-solid fa-server fa-spin"></i> Connecting to Backend...`;
+
+            fetch('/api/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: long,
+                    vehicle: selectedVehicleType,
+                    issue: selectedIssueType
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    radar.style.display = 'none';
+                    liveMap.style.display = 'block';
+
+                    statusIndicator.style.color = 'var(--success-color)';
+                    statusIndicator.innerHTML = `<i class="fa-solid fa-circle-check"></i> Connected to Server`;
+
+                    mechanicList.style.display = 'block';
+                    applyMechanicFilter('fastest');
+                })
+                .catch(error => {
+                    // FALLBACK TO OFFLINE SMS MODE (Feature 1)
+                    radar.style.display = 'none';
+                    statusIndicator.style.color = 'var(--danger-accent)';
+                    statusIndicator.innerHTML = `<i class="fa-solid fa-wifi-slash"></i> Offline Mode Active`;
+
+                    smsBox.style.display = 'block';
+                    smsBox.scrollIntoView({ behavior: 'smooth' });
+                    alert("Server connection failed. Offline SMS Fallback system is now active at the bottom!");
+                });
+        }
+    </script>
+</body>
+
+</html>
