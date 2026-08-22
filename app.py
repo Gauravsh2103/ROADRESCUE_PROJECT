@@ -93,10 +93,6 @@ if __name__ == '__main__':
 def serve_manifest():
     return app.send_static_file('manifest.json')
 
-@app.route('/service-worker.js')
-def serve_sw():
-    return app.send_static_file('service-worker.js')
-
 @app.route('/sw.js')
 def serve_sw():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'sw.js', mimetype='application/javascript')
