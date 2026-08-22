@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roadrescue-cache-v1';
+const CACHE_NAME = 'roadrescue-cache-v2';
 const urlsToCache = [
     '/',
     '/static/manifest.json'
