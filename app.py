@@ -1,6 +1,7 @@
 import math
 import sqlite3
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, jsonify, request, send_from_directory
+import os
 
 app = Flask(__name__)
 
@@ -95,3 +96,7 @@ def serve_manifest():
 @app.route('/service-worker.js')
 def serve_sw():
     return app.send_static_file('service-worker.js')
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'sw.js', mimetype='application/javascript')

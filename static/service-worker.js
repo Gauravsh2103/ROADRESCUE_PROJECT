@@ -1,22 +1,30 @@
-const CACHE_NAME = 'roadrescue-v1';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'roadrescue-cache-v1';
+const urlsToCache = [
     '/',
-    'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+    '/static/manifest.json'
 ];
 
-self.addEventListener('install', (event) => {
+// Install Service Worker and Cache Assets
+self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(urlsToCache);
+            })
     );
 });
 
-self.addEventListener('fetch', (event) => {
+// Cache and Return Requests
+self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request);
-        })
+        caches.match(event.request)
+            .then(response => {
+                // Cache hit - return response
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request);
+            })
     );
 });
