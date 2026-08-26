@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadRescue Gateway - Secure Access</title>
+    <!-- Fonts and Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --glass-bg: rgba(20, 24, 33, 0.7);
+            --neon-red: #ff3333;
+            --neon-red-glow: rgba(255, 51, 51, 0.4);
+            --neon-green: #39ff14;
+            --text-primary: #ffffff;
+            --text-secondary: #8b949e;
+            --border-color: rgba(255, 51, 51, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 10% 20%, rgba(255, 51, 51, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(57, 255, 20, 0.05) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Ambient glowing circles */
+        .glow-sphere-1 {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: var(--neon-red);
+            filter: blur(150px);
+            opacity: 0.15;
+            top: 15%;
+            left: 20%;
+            pointer-events: none;
+        }
+
+        .glow-sphere-2 {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: var(--neon-green);
+            filter: blur(150px);
+            opacity: 0.1;
+            bottom: 15%;
+            right: 20%;
+            pointer-events: none;
+        }
+
+        /* Glass Container */
+        .gateway-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px var(--neon-red-glow);
+            z-index: 10;
+            position: relative;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-section i {
+            font-size: 2.8rem;
+            color: var(--neon-red);
+            text-shadow: 0 0 15px var(--neon-red-glow);
+            margin-bottom: 10px;
+        }
+
+        .logo-section h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .logo-section p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* Cyber Role Toggle */
+        .role-selector {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .role-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 12px 0;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .role-btn.active {
+            color: var(--text-primary);
+        }
+
+        .toggle-indicator {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, var(--neon-red), #b30000);
+            border-radius: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+            box-shadow: 0 0 15px var(--neon-red-glow);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 15px 14px 45px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red-glow);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control:focus+i {
+            color: var(--neon-red);
+            text-shadow: 0 0 8px var(--neon-red-glow);
+        }
+
+        /* Dynamic Selector for Mechanic Registration */
+        .specialization-group {
+            display: none;
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-red), #b30000);
+            color: var(--text-primary);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--neon-red-glow);
+            filter: brightness(1.1);
+        }
+
+        .form-toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-toggle-link a {
+            color: var(--neon-red);
+            text-decoration: none;
+            font-weight: 700;
+            transition: text-shadow 0.3s;
+        }
+
+        .form-toggle-link a:hover {
+            text-shadow: 0 0 8px var(--neon-red-glow);
+        }
+
+        /* Flash messages styling */
+        .alert {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid var(--neon-red);
+            color: #ffb3b3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow-sphere-1"></div>
+    <div class="glow-sphere-2"></div>
+
+    <div class="gateway-card">
+        <div class="logo-section">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h1>ROADRESCUE</h1>
+            <p id="gateway-tagline">Secure Authentication Portal</p>
+        </div>
+
+        <!-- Cyber Role Switcher -->
+        <div class="role-selector">
+            <button type="button" class="role-btn active" onclick="switchRole('user')">COMMUTER</button>
+            <button type="button" class="role-btn" onclick="switchRole('mechanic')">MECHANIC</button>
+            <div class="toggle-indicator" id="toggle-indicator"></div>
+        </div>
+
+        <!-- Flask Flash Error Messages -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Unified Form (Action and Inputs change dynamically) -->
+        <form id="authForm" action="/login" method="POST">
+            <!-- Hidden inputs to track states -->
+            <input type="hidden" id="role_type" name="role_type" value="user">
+            <input type="hidden" id="auth_mode" name="auth_mode" value="signin">
+
+            <!-- Full Name (Only for Sign Up) -->
+            <div class="form-group" id="name-group" style="display: none;">
+                <input type="text" class="form-control" id="name" name="name" placeholder="Full Name">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <!-- Email (For Both) -->
+            <div class="form-group">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required>
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+
+            <!-- Phone (Only for Sign Up) -->
+            <div class="form-group" id="phone-group" style="display: none;">
+                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Contact Number">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+
+            <!-- Specialization (Only for Mechanic Sign Up) -->
+            <div class="form-group specialization-group" id="specialization-group">
+                <select class="form-control" id="specialization" name="specialization" style="padding-left: 45px;">
+                    <option value="" disabled selected>Select Your Expertise</option>
+                    <option value="Tyre Repair">Tyre Repair (Puncture Specialist)</option>
+                    <option value="Battery & Electric">Battery & Electrician</option>
+                    <option value="Engine & Brake">Engine & Mechanical Repair</option>
+                    <option value="All-rounder">All-rounder General Assistant</option>
+                </select>
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+
+            <!-- Password (For Both) -->
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Secure Password"
+                    required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-action" id="submitBtn">SIGN IN</button>
+        </form>
+
+        <!-- Dynamic Toggle Link -->
+        <div class="form-toggle-link">
+            <span id="toggleText">New to RoadRescue? </span>
+            <a href="#" id="toggleAction" onclick="toggleAuthMode(event)">Create Account</a>
+        </div>
+    </div>
+
+    <script>
+        const indicator = document.getElementById('toggle-indicator');
+        const roleBtns = document.querySelectorAll('.role-btn');
+        const roleTypeInput = document.getElementById('role_type');
+        const authModeInput = document.getElementById('auth_mode');
+
+        const nameGroup = document.getElementById('name-group');
+        const phoneGroup = document.getElementById('phone-group');
+        const specGroup = document.getElementById('specialization-group');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleText = document.getElementById('toggleText');
+        const toggleAction = document.getElementById('toggleAction');
+        const authForm = document.getElementById('authForm');
+
+        // 1. Role Switching Logic (User vs Mechanic)
+        function switchRole(role) {
+            roleTypeInput.value = role;
+
+            if (role === 'user') {
+                indicator.style.left = '4px';
+                roleBtns[0].classList.add('active');
+                roleBtns[1].classList.remove('active');
+                specGroup.style.display = 'none';
+                document.getElementById('specialization').removeAttribute('required');
+            } else {
+                indicator.style.left = 'calc(50% - 4px)';
+                roleBtns[0].classList.remove('active');
+                roleBtns[1].classList.add('active');
+
+                // Show specialization if signing up as mechanic
+                if (authModeInput.value === 'signup') {
+                    specGroup.style.display = 'block';
+                    document.getElementById('specialization').setAttribute('required', 'required');
+                }
+            }
+            updateFormStates();
+        }
+
+        // 2. Auth Mode Toggle Logic (Sign In vs Sign Up)
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            const currentMode = authModeInput.value;
+
+            if (currentMode === 'signin') {
+                // Switch to Sign Up mode
+                authModeInput.value = 'signup';
+                authForm.action = '/register';
+                nameGroup.style.display = 'block';
+                document.getElementById('name').setAttribute('required', 'required');
+                phoneGroup.style.display = 'block';
+                document.getElementById('phone').setAttribute('required', 'required');
+
+                if (roleTypeInput.value === 'mechanic') {
+                    specGroup.style.display = 'block';
+                    document.getElementById('specialization').setAttribute('required', 'required');
+                }
+
+                submitBtn.innerText = 'CREATE ACCOUNT';
+                toggleText.innerText = 'Already have an account? ';
+                toggleAction.innerText = 'Sign In';
+            } else {
+                // Switch back to Sign In mode
+                authModeInput.value = 'signin';
+                authForm.action = '/login';
+                nameGroup.style.display = 'none';
+                document.getElementById('name').removeAttribute('required');
+                phoneGroup.style.display = 'none';
+                document.getElementById('phone').removeAttribute('required');
+                specGroup.style.display = 'none';
+                document.getElementById('specialization').removeAttribute('required');
+
+                submitBtn.innerText = 'SIGN IN';
+                toggleText.innerText = 'New to RoadRescue? ';
+                toggleAction.innerText = 'Create Account';
+            }
+        }
+
+        function updateFormStates() {
+            // Helper to keep inputs validated based on current modes
+            if (authModeInput.value === 'signup' && roleTypeInput.value === 'mechanic') {
+                specGroup.style.display = 'block';
+                document.getElementById('specialization').setAttribute('required', 'required');
+            } else {
+                specGroup.style.display = 'none';
+                document.getElementById('specialization').removeAttribute('required');
+            }
+        }
+    </script>
+</body>
+
+</html>
