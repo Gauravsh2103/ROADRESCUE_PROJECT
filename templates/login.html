@@ -353,12 +353,13 @@
         const toggleAction = document.getElementById('toggleAction');
         const authForm = document.getElementById('authForm');
 
-        // 1. Role Switching Logic (User vs Mechanic)
+        // 1. Role Switching Logic (User vs Mechanic) - FIXED NodeList Crash
         function switchRole(role) {
             roleTypeInput.value = role;
 
             if (role === 'user') {
                 indicator.style.left = '4px';
+                // Individual elements ko target kiya class list ke liye
                 roleBtns[0].classList.add('active');
                 roleBtns[1].classList.remove('active');
                 specGroup.style.display = 'none';
