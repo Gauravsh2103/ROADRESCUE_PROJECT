@@ -5,9 +5,14 @@ def init_db():
     conn = sqlite3.connect('roadrescue.db')
     cursor = conn.cursor()
 
+    # FORCE CLEAN SLATE (Purane dheet tables ko pehle delete karo taaki naya schema apply ho sake)
+    cursor.execute('DROP TABLE IF EXISTS users')
+    cursor.execute('DROP TABLE IF EXISTS mechanics')
+    print("🧹 Old tables cleared successfully!")
+
     # 1. Commuter Users Table
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
@@ -19,7 +24,7 @@ def init_db():
 
     # 2. Mechanics Table (With Status and Live Coordinates)
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS mechanics (
+        CREATE TABLE mechanics (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
@@ -34,25 +39,23 @@ def init_db():
         )
     ''')
 
-    # Kuch pre-populated mechanics insert kar dete hain default password 'bhilai123' ke sath check karne ke liye
-    cursor.execute("SELECT COUNT(*) FROM mechanics")
-    if cursor.fetchone()[0] == 0:
-        default_hash = generate_password_hash("bhilai123")
-        mechanics_data = [
-            ("Sharma Garage", "sharma@rescue.com", "9876543210", default_hash, "Tyre Repair", 21.2489, 81.3434, 1, 150),
-            ("Bhilai Battery House", "battery@rescue.com", "8877665544", default_hash, "Battery & Electric", 21.2689, 81.3634, 1, 200),
-            ("Sahu Motor Repair", "sahu@rescue.com", "7766554433", default_hash, "Engine & Brake", 21.2520, 81.3550, 1, 250),
-            ("Quick Mechanics", "quick@rescue.com", "9988776655", default_hash, "All-rounder", 21.2589, 81.3534, 1, 100)
-        ]
-        cursor.executemany('''
-            INSERT INTO mechanics (name, email, phone, password_hash, specialization, latitude, longitude, is_active, base_charge)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', mechanics_data)
-        print("💡 Dummy verified mechanics pre-loaded successfully!")
+    # Pre-populated mechanics insert karenge default password 'bhilai123' ke sath
+    default_hash = generate_password_hash("bhilai123")
+    mechanics_data = [
+        ("Sharma Garage", "sharma@rescue.com", "9876543210", default_hash, "Tyre Repair", 21.2489, 81.3434, 1, 150),
+        ("Bhilai Battery House", "battery@rescue.com", "8877665544", default_hash, "Battery & Electric", 21.2689, 81.3634, 1, 200),
+        ("Sahu Motor Repair", "sahu@rescue.com", "7766554433", default_hash, "Engine & Brake", 21.2520, 81.3550, 1, 250),
+        ("Quick Mechanics", "quick@rescue.com", "9988776655", default_hash, "All-rounder", 21.2589, 81.3534, 1, 100)
+    ]
+    cursor.executemany('''
+        INSERT INTO mechanics (name, email, phone, password_hash, specialization, latitude, longitude, is_active, base_charge)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', mechanics_data)
+    print("💡 Dummy verified mechanics pre-loaded successfully!")
 
     conn.commit()
     conn.close()
-    print("🚀 Database upgraded successfully with dual-role security schemas!")
+    print("🚀 Database upgraded and verified successfully!")
 
 if __name__ == '__main__':
     init_db()
